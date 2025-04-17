@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function analyzeMarket(symbol) {
-        const formattedSymbol = symbol.replace("USDT", "/USDT"); // BTCUSDT → BTC/USDT
+        const formattedSymbol = symbol.includes("/") ? symbol : `${symbol.slice(0, -4)}/${symbol.slice(-4)}`;
         fetch(`https://pussy-destroyer-backend.vercel.app/analyze?symbol=${formattedSymbol}`)
             .then(response => {
                 if (!response.ok) {
