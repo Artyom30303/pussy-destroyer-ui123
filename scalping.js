@@ -22,15 +22,20 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function analyzeMarket(symbol) {
-        const formattedSymbol = symbol.slice(0, -4) + "/" + symbol.slice(-4); // BTCUSDT → BTC/USDT
+        const formattedSymbol = symbol.replace("USDT", "/USDT"); // BTCUSDT → BTC/USDT
         fetch(`https://pussy-destroyer-backend.vercel.app/analyze?symbol=${formattedSymbol}`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Ошибка сервера: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
-                document.getElementById("signal").innerText = data.signal || "-";
+                document.getElementById("signal").innerText = data.signal || "Нет данных";
                 document.getElementById("entry").innerText = data.entry ? `$${data.entry}` : "-";
                 document.getElementById("stoploss").innerText = data.stop ? `$${data.stop}` : "-";
                 document.getElementById("take1").innerText = data.take ? `$${data.take}` : "-";
-                document.getElementById("argument").innerText = data.argument || "-";
+                document.getElementById("argument").innerText = data.argument || "Нет аргументации";
             })
             .catch(error => {
                 console.error("Ошибка при получении данных:", error);
@@ -55,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Загружаем данные по умолчанию
+    // Инициализация при загрузке
     loadTradingView("BTCUSDT");
     analyzeMarket("BTCUSDT");
 });
