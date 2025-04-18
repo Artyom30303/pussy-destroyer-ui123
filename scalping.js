@@ -22,8 +22,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function analyzeMarket(symbol) {
-        const formattedSymbol = symbol.includes("/") ? symbol : `${symbol.slice(0, -4)}/${symbol.slice(-4)}`;
-        fetch(`https://pussy-destroyer-backend.vercel.app/analyze?symbol=${formattedSymbol}`)
+        // Без форматирования — отправляем символ как есть, например BTCUSDT
+        fetch(`https://pussy-destroyer-backend.vercel.app/analyze?symbol=${symbol}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`Ошибка сервера: ${response.status}`);
