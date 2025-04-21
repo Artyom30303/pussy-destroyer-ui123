@@ -9,8 +9,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function fetchAnalysis(symbol) {
         const response = await fetch(`https://pussy-destroyer-backend.vercel.app/api/analyze?symbol=${symbol}`);
-        const data = await response.json();
-        return data;
+        if (!response.ok) {
+            console.error("Ошибка при получении данных с сервера");
+            return {
+                direction: "ERROR",
+                reason: ["Не удалось получить данные от сервера"]
+            };
+        }
+        return await response.json();
     }
 
     function loadTradingView(symbol) {
@@ -43,9 +49,9 @@ document.addEventListener("DOMContentLoaded", () => {
         entryBox.textContent = result.entry || "-";
         stopBox.textContent = result.sl || "-";
         tpBox.textContent = result.tp1 || "-";
-        argBox.textContent = (result.reason || []).join("; ");
+        argBox.textContent = (result.reason || ["-"]).join("; ");
     });
 
-    // Загрузка сразу при старте
+    // Загрузка при первом открытии
     dropdown.dispatchEvent(new Event("change"));
 });
