@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const dropdown = document.getElementById("symbol_select");
+    if (!dropdown) return;
+
     const signalBox = document.getElementById("signal");
     const entryBox = document.getElementById("entry");
     const stopBox = document.getElementById("stoploss");
@@ -8,15 +10,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const tvContainer = document.getElementById("tradingview_chart");
 
     async function fetchAnalysis(symbol) {
-        const response = await fetch(`https://pussy-destroyer-backend.vercel.app/api/analyze?symbol=${symbol}`);
-        if (!response.ok) {
-            console.error("Ошибка при получении данных с сервера");
+        try {
+            const response = await fetch(`https://pussy-destroyer-backend.vercel.app/api/analyze?symbol=${symbol}`);
+            return await response.json();
+        } catch (err) {
             return {
                 direction: "ERROR",
-                reason: ["Не удалось получить данные от сервера"]
+                reason: ["Ошибка соединения с API"],
             };
         }
-        return await response.json();
     }
 
     function loadTradingView(symbol) {
@@ -49,9 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
         entryBox.textContent = result.entry || "-";
         stopBox.textContent = result.sl || "-";
         tpBox.textContent = result.tp1 || "-";
-        argBox.textContent = (result.reason || ["-"]).join("; ");
+        argBox.textContent = (result.reason || []).join("; ");
     });
 
-    // Загрузка при первом открытии
     dropdown.dispatchEvent(new Event("change"));
 });
