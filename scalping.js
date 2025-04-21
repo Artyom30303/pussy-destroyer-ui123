@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
         entryBox.textContent = result.entry || "-";
         stopBox.textContent = result.sl || "-";
         tpBox.textContent = result.tp1 || "-";
-        argBox.textContent = (result.reason || []).join("; ");
+        argBox.textContent = (result.reason || ["-"]).join("; ");
     });
 
     dropdown.dispatchEvent(new Event("change"));
