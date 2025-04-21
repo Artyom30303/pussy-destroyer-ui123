@@ -1,7 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const symbolInput = document.getElementById("symbol_input");
-    const button = document.getElementById("analyze_btn");
-    const resultBox = document.getElementById("result");
+    const dropdown = document.getElementById("symbol_select");
+    const signalBox = document.getElementById("signal");
+    const entryBox = document.getElementById("entry");
+    const stopBox = document.getElementById("stoploss");
+    const tpBox = document.getElementById("take1");
+    const argBox = document.getElementById("argument");
+    const tvContainer = document.getElementById("tradingview_chart");
 
     async function fetchAnalysis(symbol) {
         const response = await fetch(`https://pussy-destroyer-backend.vercel.app/api/analyze?symbol=${symbol}`);
@@ -9,28 +13,39 @@ document.addEventListener("DOMContentLoaded", () => {
         return data;
     }
 
-    button.addEventListener("click", async () => {
-        const symbol = symbolInput.value.toUpperCase().trim();
-        resultBox.innerHTML = "Загрузка...";
-        const res = await fetchAnalysis(symbol);
+    function loadTradingView(symbol) {
+        tvContainer.innerHTML = "";
+        new TradingView.widget({
+            "container_id": "tradingview_chart",
+            "width": "100%",
+            "height": "400",
+            "symbol": `BINANCE:${symbol}`,
+            "interval": "60",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "ru",
+            "toolbar_bg": "#111",
+            "enable_publishing": false,
+            "allow_symbol_change": true,
+            "hide_top_toolbar": false,
+            "hide_legend": false
+        });
+    }
 
-        if (res.direction === "NONE") {
-            resultBox.innerHTML = `<p>Нет сигнала по ${res.symbol}</p><p>Причина: ${res.reason[0]}</p>`;
-            return;
-        }
+    dropdown.addEventListener("change", async () => {
+        const symbol = dropdown.value;
+        loadTradingView(symbol);
 
-        resultBox.innerHTML = `
-            <h3>${res.symbol}</h3>
-            <p><strong>Сигнал:</strong> ${res.direction}</p>
-            <p><strong>Confidence:</strong> ${res.confidence}%</p>
-            <p><strong>Entry:</strong> ${res.entry}</p>
-            <p><strong>SL:</strong> ${res.sl}</p>
-            <p><strong>TP1:</strong> ${res.tp1}</p>
-            <p><strong>TP2:</strong> ${res.tp2}</p>
-            <details>
-                <summary>Обоснование сигнала</summary>
-                <ul>${res.reason.map(r => `<li>${r}</li>`).join("")}</ul>
-            </details>
-        `;
+        const result = await fetchAnalysis(symbol);
+
+        signalBox.textContent = result.direction || "-";
+        entryBox.textContent = result.entry || "-";
+        stopBox.textContent = result.sl || "-";
+        tpBox.textContent = result.tp1 || "-";
+        argBox.textContent = (result.reason || []).join("; ");
     });
+
+    // Загрузка сразу при старте
+    dropdown.dispatchEvent(new Event("change"));
 });
