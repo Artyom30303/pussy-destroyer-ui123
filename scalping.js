@@ -1,6 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("🔥 DOM загружен");
+
     const dropdown = document.getElementById("symbol_select");
-    if (!dropdown) return;
+    if (!dropdown) {
+        console.error("❌ Не найден элемент #symbol_select");
+        return;
+    }
 
     const signalBox = document.getElementById("signal");
     const entryBox = document.getElementById("entry");
@@ -10,10 +15,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const tvContainer = document.getElementById("tradingview_chart");
 
     async function fetchAnalysis(symbol) {
+        console.log("📡 Запрос на анализ:", symbol);
         try {
             const response = await fetch(`https://pussy-destroyer-backend.vercel.app/api/analyze?symbol=${symbol}`);
-            return await response.json();
+            const data = await response.json();
+            console.log("✅ Ответ от backend:", data);
+            return data;
         } catch (err) {
+            console.error("❌ Ошибка запроса:", err);
             return {
                 direction: "ERROR",
                 reason: ["Ошибка соединения с API"],
@@ -22,6 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function loadTradingView(symbol) {
+        console.log("📊 Загружаю график:", symbol);
         tvContainer.innerHTML = "";
         new TradingView.widget({
             "container_id": "tradingview_chart",
@@ -43,6 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     dropdown.addEventListener("change", async () => {
         const symbol = dropdown.value;
+        console.log("🔄 Смена монеты:", symbol);
+
         loadTradingView(symbol);
 
         const result = await fetchAnalysis(symbol);
@@ -54,5 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
         argBox.textContent = (result.reason || ["-"]).join("; ");
     });
 
+    // Инициируем первый запрос вручную
     dropdown.dispatchEvent(new Event("change"));
 });
